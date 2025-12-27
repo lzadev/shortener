@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Shortener.Api/Shortener.Api.csproj" />
+  <Project Path="Shortener.AppHost/Shortener.AppHost.csproj" />
+  <Project Path="Shortener.ServiceDefaults/Shortener.ServiceDefaults.csproj" />
+</Solution>
