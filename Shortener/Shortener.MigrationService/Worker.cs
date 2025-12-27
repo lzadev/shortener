@@ -23,6 +23,7 @@ public class Worker(
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
             await RunMigrationAsync(dbContext, cancellationToken);
+            await InsertBulkShortUrlsAsync(dbContext, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -41,5 +42,64 @@ public class Worker(
         {
             await dbContext.Database.MigrateAsync(cancellationToken);
         });
+    }
+
+    private static async Task InsertBulkShortUrlsAsync(
+        ApplicationDbContext dbContext, CancellationToken cancellationToken)
+    {
+
+        if(dbContext.ShortUrls.Any())
+            return;
+
+
+        const int totalRecords = 100_000;
+        const int batchSize = 5_000;
+
+        var strategy = dbContext.Database.CreateExecutionStrategy();
+
+        var generatedCodes = new HashSet<string>(StringComparer.Ordinal);
+
+
+        await strategy.ExecuteAsync(async () =>
+        {
+            for (int i = 0; i < totalRecords; i += batchSize)
+            {
+                var batch = new List<Api.Entities.ShortUrl>(batchSize);
+                for (int j = 0; j < batchSize && (i + j) < totalRecords; j++)
+                {
+                    string shortCode;
+                    do
+                    {
+                        shortCode = GenerateRandomShortCode(6);
+                    } while (!generatedCodes.Add(shortCode));
+
+                    batch.Add(new Api.Entities.ShortUrl
+                    {
+                        Url = $"https://example.com/{i + j}",
+                        Code = shortCode,
+                        //CreatedAt = DateTime.UtcNow
+                    });
+                }
+
+                await using var transaction = await dbContext.Database
+                    .BeginTransactionAsync(cancellationToken);
+
+                dbContext.ShortUrls.AddRange(batch);
+                await dbContext.SaveChangesAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+            }
+        });
+    }
+
+    private static string GenerateRandomShortCode(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+        var code = new char[length];
+        for (int i = 0; i < length; i++)
+        {
+            code[i] = chars[random.Next(chars.Length)];
+        }
+        return new string(code);
     }
 }

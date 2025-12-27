@@ -1,6 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgress-db")
+    .WithHostPort(5432)
     .WithLifetime(ContainerLifetime.Persistent)
     .WithDataVolume("shorter-db");
 
