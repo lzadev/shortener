@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Shortener.Api/Shortener.Api.csproj" />
   <Project Path="Shortener.AppHost/Shortener.AppHost.csproj" />
+  <Project Path="Shortener.MigrationService/Shortener.MigrationService.csproj" Id="b94591a3-da7d-4cd0-96bd-9f238da59b6f" />
   <Project Path="Shortener.ServiceDefaults/Shortener.ServiceDefaults.csproj" />
 </Solution>

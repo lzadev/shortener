@@ -6,8 +6,13 @@ var postgres = builder.AddPostgres("postgress-db")
 
 var shortenerDb = postgres.AddDatabase("shorter-db");
 
-builder.AddProject<Projects.Shortener_Api>("shortener-api")
+var migrations = builder.AddProject<Projects.Shortener_MigrationService>("migrations")
     .WithReference(shortenerDb)
     .WaitFor(shortenerDb);
+
+builder.AddProject<Projects.Shortener_Api>("shortener-api")
+    .WithReference(shortenerDb)
+    .WithReference(migrations)
+    .WaitFor(migrations);
 
 builder.Build().Run();
