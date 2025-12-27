@@ -1,6 +1,11 @@
+using Shortener.Api;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+
+
+builder.AddNpgsqlDbContext<ApplicationDbContext>("shorter-db");
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
