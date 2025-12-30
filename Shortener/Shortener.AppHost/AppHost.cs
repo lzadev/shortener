@@ -11,9 +11,16 @@ var migrations = builder.AddProject<Projects.Shortener_MigrationService>("migrat
     .WithReference(shortenerDb)
     .WaitFor(shortenerDb);
 
+var redis = builder.AddRedis("redis")
+    .WithDataVolume("redis-shorter-data")
+    .WithPersistence(
+        interval: TimeSpan.FromMinutes(5),
+        keysChangedThreshold: 100);
+
 builder.AddProject<Projects.Shortener_Api>("shortener-api")
     .WithReference(shortenerDb)
     .WithReference(migrations)
+    .WithReference(redis)
     .WaitFor(migrations);
 
 builder.Build().Run();
