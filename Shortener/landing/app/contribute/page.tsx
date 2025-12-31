@@ -12,14 +12,14 @@ export default function ContributePage() {
             title: 'Code Contributions',
             description: 'Help us build new features, fix bugs, or improve performance. Check our GitHub issues for good first issues.',
             action: 'Browse Issues',
-            link: 'https://github.com/yourusername/url-shortener/issues'
+            link: 'https://github.com/lzadev/shortener/issues'
         },
         {
             icon: Star,
             title: 'Star on GitHub',
             description: 'Show your support by starring our repository. It helps us grow and reach more developers.',
             action: 'Star Repository',
-            link: 'https://github.com/yourusername/url-shortener'
+            link: 'https://github.com/lzadev/shortener'
         },
         {
             icon: Coffee,
@@ -128,7 +128,7 @@ export default function ContributePage() {
                 </div>
 
                 <div className="text-center mt-8">
-                    <a href="https://github.com/yourusername/url-shortener/graphs/contributors" target="_blank" rel="noopener noreferrer">
+                    <a href="https://github.com/lzadev/shortener/graphs/contributors" target="_blank" rel="noopener noreferrer">
                         <Button variant="outline" className="border-2">
                             <Github className="mr-2 h-4 w-4" />
                             View All Contributors
@@ -155,7 +155,7 @@ export default function ContributePage() {
                             </Button>
                         </a>
                         <a href="https://buymeacoffee.com/yourusername" target="_blank" rel="noopener noreferrer">
-                            <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 px-8 py-6 text-lg">
+                            <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-purple-700 px-8 py-6 text-lg transition-colors">
                                 <Coffee className="mr-2 h-5 w-5" />
                                 Buy us a Coffee
                             </Button>
@@ -163,31 +163,6 @@ export default function ContributePage() {
                     </div>
                 </div>
             </section>
-
-            {/* Footer */}
-            <footer className="border-t border-gray-100 py-12">
-                <div className="container mx-auto px-4">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center">
-                                <Link2 className="h-4 w-4 text-white" />
-                            </div>
-                            <span className="text-sm text-gray-600">
-                                Open Source URL Shortener
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-6 text-sm text-gray-600">
-                            <Link href="/" className="hover:text-gray-900 transition-colors">
-                                Home
-                            </Link>
-                            <a href="https://github.com/lzadev/shortener" target="_blank" className="hover:text-gray-900 transition-colors flex items-center gap-1">
-                                <Github className="h-4 w-4" />
-                                GitHub
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
         </div>
     );
 }

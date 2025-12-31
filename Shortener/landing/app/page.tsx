@@ -150,58 +150,6 @@ export default function LandingPage() {
                     </Link>
                 </div>
             </section>
-
-
-            {/* Footer */}
-            <footer className="border-t border-gray-200 bg-white py-12">
-                <div className="container mx-auto px-4">
-                    {/* Copyright and Powered By */}
-                    <div className="text-center mb-8">
-                        <p className="text-sm text-gray-600 mb-2 flex items-center justify-center gap-1">
-                            <span>© {new Date().getFullYear()} URL Shortener</span>
-                            <span className="text-gray-400">•</span>
-                            <span>Fast & Reliable Link Shortening</span>
-                        </p>
-                        <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
-                            <span>Powered by</span>
-                            <a
-                                href="https://github.com/lzadev"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-purple-600 hover:text-purple-700 transition-colors font-medium inline-flex items-center gap-1"
-                            >
-                                <Github className="h-3.5 w-3.5" />
-                                LZADev
-                            </a>
-                        </p>
-                    </div>
-
-                    {/* Links */}
-                    <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600">
-                        <Link href="/app" className="hover:text-gray-900 transition-colors inline-flex items-center gap-1.5">
-                            <Link2 className="h-4 w-4" />
-                            ShortURL
-                        </Link>
-                        <Link href="/app" className="hover:text-gray-900 transition-colors inline-flex items-center gap-1.5">
-                            <BarChart3 className="h-4 w-4" />
-                            URL Click Counter
-                        </Link>
-                        <Link href="/contribute" className="hover:text-gray-900 transition-colors inline-flex items-center gap-1.5">
-                            <Heart className="h-4 w-4" />
-                            Contribute
-                        </Link>
-                        <a
-                            href="https://github.com/yourusername/url-shortener"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-gray-900 transition-colors inline-flex items-center gap-1.5"
-                        >
-                            <Github className="h-4 w-4" />
-                            GitHub
-                        </a>
-                    </div>
-                </div>
-            </footer>
         </div>
     );
 }
