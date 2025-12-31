@@ -1,1 +1,1 @@
-internal record ShortUrlDto(int Id, string Url);
+internal record ShortUrlDto(string ShortUrl, string LongUrl, string Code);

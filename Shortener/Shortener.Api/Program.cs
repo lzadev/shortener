@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shortener.Api;
+using Shortener.Api.Entities;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,13 +33,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/shortener", async (ApplicationDbContext context) =>
+app.MapGet("/", async (ApplicationDbContext context) =>
 {
     return await context.ShortUrls.ToListAsync();
 })
 .WithName("GetShortenerUrl");
 
-app.MapGet("/shortener/{code}", async (string code, ApplicationDbContext context, IConnectionMultiplexer connectionMux) =>
+app.MapGet("/{code}", async (string code, ApplicationDbContext context, IConnectionMultiplexer connectionMux) =>
 {
     var key = code.ToLower();
 
@@ -48,23 +49,20 @@ app.MapGet("/shortener/{code}", async (string code, ApplicationDbContext context
 
     if (cachedShortUrl.HasValue)
     {
-        var shortUrlDto = JsonSerializer.Deserialize<ShortUrlDto>(
+        var shortUrlDto = JsonSerializer.Deserialize<ShortUrl>(
             Encoding.UTF8.GetString(cachedShortUrl!)
         );
 
         await InsertHistory(context, shortUrlDto!.Id);
 
-        return Results.Redirect(shortUrlDto!.Url);
+        return Results.Redirect(shortUrlDto!.LongUrl);
     }
 
     var shortUrl = await context.ShortUrls
-                        .Where(x => x.Code.ToLower() == key)
-                        .Select(x => new ShortUrlDto(x.Id, x.Url))
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(x => x.Code.ToLower() == key);
 
     if (shortUrl is null)
         return Results.NotFound();
-
 
     var json = JsonSerializer.Serialize(shortUrl);
 
@@ -72,9 +70,38 @@ app.MapGet("/shortener/{code}", async (string code, ApplicationDbContext context
 
     await InsertHistory(context, shortUrl.Id);
 
-    return Results.Redirect(shortUrl.Url);
+    return Results.Redirect(shortUrl.LongUrl);
 })
 .WithName("GetShortenerUrlByCode");
+
+
+app.MapGet("/shortener/{code}/visits", async (string code, ApplicationDbContext context) =>
+{
+    var visits = await context.ShortUrlHistories
+        .Where(h => h.ShortUrl.Code.ToLower() == code.ToLower())
+        .CountAsync();
+
+    return Results.Ok(visits);
+});
+
+app.MapPost("/shortener", async ([FromBody] CreateShortUrlDto dto, ApplicationDbContext context) =>
+{
+    var code = await GetCode(context);
+
+    var shortUrl = new ShortUrl
+    {
+        LongUrl = dto.LongUrl,
+        Code = code
+    };
+
+    context.ShortUrls.Add(shortUrl);
+    await context.SaveChangesAsync();
+
+    var response = shortUrl.ToDto();
+
+    return Results.Created($"{response.ShortUrl}", response);
+
+}).WithName("CreateShortenerUrl");
 
 static async Task InsertHistory(ApplicationDbContext context, int shortUrlId)
 {
@@ -85,6 +112,24 @@ static async Task InsertHistory(ApplicationDbContext context, int shortUrlId)
     };
     context.ShortUrlHistories.Add(history);
     await context.SaveChangesAsync();
+}
+
+static async Task<string> GetCode(ApplicationDbContext context)
+{
+    string code;
+    do
+    {
+        code = GenerateCode();
+    } while (await context.ShortUrls.AnyAsync(x => x.Code == code));
+    return code;
+}
+
+static string GenerateCode(int length = 6)
+{
+    const string chars = "abcdefghijklmnopqrstuvwxyz123456789";
+    var random = new Random();
+    return new string(Enumerable.Repeat(chars, length)
+        .Select(s => s[random.Next(s.Length)]).ToArray());
 }
 
 app.Run();

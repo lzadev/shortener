@@ -48,8 +48,13 @@ public class Worker(
         ApplicationDbContext dbContext, CancellationToken cancellationToken)
     {
 
-        if(dbContext.ShortUrls.Any())
+        if (dbContext.ShortUrls.Any())
+        {
             return;
+            // dbContext.ShortUrlHistories.ExecuteDelete();
+            // dbContext.ShortUrls.ExecuteDelete();
+            // await dbContext.SaveChangesAsync(cancellationToken);
+        }
 
 
         const int totalRecords = 100_000;
@@ -75,8 +80,8 @@ public class Worker(
 
                     batch.Add(new Api.Entities.ShortUrl
                     {
-                        Url = $"https://example.com/{i + j}",
-                        Code = shortCode,
+                        LongUrl = "https://blog.pragmaticengineer.com/a-philosophy-of-software-design-review/",
+                        Code = shortCode
                         //CreatedAt = DateTime.UtcNow
                     });
                 }
