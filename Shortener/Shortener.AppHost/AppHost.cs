@@ -23,9 +23,10 @@ var api = builder.AddProject<Projects.Shortener_Api>("api")
     .WithReference(redis)
     .WaitFor(migrations);
 
-
-builder.AddJavaScriptApp("web", "../frontend")
+builder.AddJavaScriptApp("shortener-app", "../shortener-app")
     .WithReference(api)
     .WaitFor(api);
+
+builder.AddJavaScriptApp("shortener-landing-page", "../shortener-landing-page");
 
 builder.Build().Run();
