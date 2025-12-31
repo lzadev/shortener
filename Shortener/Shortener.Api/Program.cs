@@ -10,12 +10,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-
 builder.AddNpgsqlDbContext<ApplicationDbContext>("shorter-db");
 
 builder.AddRedisClient(connectionName: "redis");
 
 builder.Services.AddSignalR();
+
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -30,6 +40,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 
