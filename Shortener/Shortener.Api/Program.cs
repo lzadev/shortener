@@ -77,7 +77,7 @@ app.MapGet("/{code}", async (string code, ApplicationDbContext context, IConnect
 
         visits = await GetVisits(context, shortUrlDto.Id);
 
-        await hubContext.Clients.All.SendAsync("OnShortUrlVisited", visits);
+        await hubContext.Clients.All.SendAsync("OnShortUrlVisited", shortUrlDto.Code, visits);
 
         return Results.Redirect(shortUrlDto!.LongUrl);
     }
@@ -96,7 +96,7 @@ app.MapGet("/{code}", async (string code, ApplicationDbContext context, IConnect
 
     visits = await GetVisits(context, shortUrl.Id);
 
-    await hubContext.Clients.All.SendAsync("OnShortUrlVisited", visits);
+    await hubContext.Clients.All.SendAsync("OnShortUrlVisited", shortUrl.Code, visits);
 
     return Results.Redirect(shortUrl.LongUrl);
 })

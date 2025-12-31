@@ -93,7 +93,7 @@ export function UrlShortenerForm({ onUrlCreated }: UrlShortenerFormProps) {
 
     // Set up SignalR connection when modal opens
     useEffect(() => {
-        if (showVisitsModal && !connectionRef.current) {
+        if (showVisitsModal && !connectionRef.current && shortUrl) {
             const connection = new signalR.HubConnectionBuilder()
                 .withUrl(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7153'}/short-url-history`, {
                     skipNegotiation: false,
@@ -102,10 +102,13 @@ export function UrlShortenerForm({ onUrlCreated }: UrlShortenerFormProps) {
                 .withAutomaticReconnect()
                 .build();
 
-            connection.on('OnShortUrlVisited', (newVisitCount: number) => {
-                console.log('Real-time visit update:', newVisitCount);
-                setVisitCount(newVisitCount);
-                toast.success('🔔 New visit detected!', { duration: 2000 });
+            connection.on('OnShortUrlVisited', (code: string, newVisitCount: number) => {
+                console.log('Real-time visit update:', code, newVisitCount);
+                // Only update if this is the URL we're currently viewing
+                if (code === shortUrl.code) {
+                    setVisitCount(newVisitCount);
+                    toast.success('🔔 New visit detected!', { duration: 2000 });
+                }
             });
 
             connection.start()
@@ -123,7 +126,7 @@ export function UrlShortenerForm({ onUrlCreated }: UrlShortenerFormProps) {
                 connectionRef.current = null;
             }
         };
-    }, [showVisitsModal]);
+    }, [showVisitsModal, shortUrl]);
 
     return (
         <div className="w-full max-w-3xl mx-auto space-y-4">
