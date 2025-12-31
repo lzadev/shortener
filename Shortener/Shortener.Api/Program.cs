@@ -18,7 +18,7 @@ builder.AddRedisClient(connectionName: "redis");
 
 builder.Services.AddSignalR();
 
-// Add CORS policy
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -26,19 +26,16 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // Required for SignalR
+              .AllowCredentials();
     });
 });
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -50,11 +47,11 @@ app.UseHttpsRedirection();
 
 app.MapHub<ShortUrlHistoryHub>("/short-url-history");
 
-app.MapGet("/", async (ApplicationDbContext context) =>
-{
-    return await context.ShortUrls.ToListAsync();
-})
-.WithName("GetShortenerUrl");
+// app.MapGet("/", async (ApplicationDbContext context) =>
+// {
+//     return await context.ShortUrls.ToListAsync();
+// })
+// .WithName("GetShortenerUrl");
 
 app.MapGet("/{code}", async (string code, ApplicationDbContext context, IConnectionMultiplexer connectionMux,
         IHubContext<ShortUrlHistoryHub> hubContext) =>
