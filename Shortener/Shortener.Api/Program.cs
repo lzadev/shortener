@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shortener.Api;
@@ -11,6 +13,8 @@ builder.AddServiceDefaults();
 builder.AddNpgsqlDbContext<ApplicationDbContext>("shorter-db");
 
 builder.AddRedisClient(connectionName: "redis");
+
+builder.Services.AddSignalR();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -38,20 +42,50 @@ app.MapGet("/shortener/{code}", async (string code, ApplicationDbContext context
 {
     var key = code.ToLower();
 
-    var database = connectionMux.GetDatabase();
+    var cache = connectionMux.GetDatabase();
 
-    var cachedShortUrl = await database.StringGetAsync(key);
+    var cachedShortUrl = await cache.StringGetAsync(key);
 
     if (cachedShortUrl.HasValue)
-        return Results.Redirect(cachedShortUrl!);
+    {
+        var shortUrlDto = JsonSerializer.Deserialize<ShortUrlDto>(
+            Encoding.UTF8.GetString(cachedShortUrl!)
+        );
 
-    var shortUrl = await context.ShortUrls.FirstOrDefaultAsync(x => x.Code.ToLower() == key);
+        await InsertHistory(context, shortUrlDto!.Id);
 
-    if (shortUrl is not null)
-        await database.StringSetAsync(key, shortUrl.Url, TimeSpan.FromDays(1));
+        return Results.Redirect(shortUrlDto!.Url);
+    }
 
-    return shortUrl is not null ? Results.Redirect(shortUrl.Url) : Results.NotFound();
+    var shortUrl = await context.ShortUrls
+                        .Where(x => x.Code.ToLower() == key)
+                        .Select(x => new ShortUrlDto(x.Id, x.Url))
+                        .FirstOrDefaultAsync();
+
+    if (shortUrl is null)
+        return Results.NotFound();
+
+
+    var json = JsonSerializer.Serialize(shortUrl);
+
+    await cache.StringSetAsync(key, json, TimeSpan.FromDays(1));
+
+    await InsertHistory(context, shortUrl.Id);
+
+    return Results.Redirect(shortUrl.Url);
 })
 .WithName("GetShortenerUrlByCode");
 
+static async Task InsertHistory(ApplicationDbContext context, int shortUrlId)
+{
+    var history = new ShortUrlHistory
+    {
+        ShortUrlId = shortUrlId,
+        AccessedAt = DateTime.UtcNow
+    };
+    context.ShortUrlHistories.Add(history);
+    await context.SaveChangesAsync();
+}
+
 app.Run();
+
