@@ -27,6 +27,6 @@ builder.AddJavaScriptApp("shortener-app", "../shortener-app")
     .WithReference(api)
     .WaitFor(api);
 
-builder.AddJavaScriptApp("shortener-landing-page", "../shortener-landing-page");
+builder.AddJavaScriptApp("shortener-landing-page", "../shortener-landing-web");
 
 builder.Build().Run();

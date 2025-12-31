@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,21 @@ builder.AddRedisClient(connectionName: "redis");
 
 builder.Services.AddSignalR();
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    {
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+            });
+    });
+});
+
 
 builder.Services.AddCors(options =>
 {
@@ -33,6 +49,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseRateLimiter();
 
 app.MapDefaultEndpoints();
 
