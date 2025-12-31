@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { createShortUrl } from '@/lib/api';
 import { ShortUrlDto } from '@/lib/types';
 import { toast } from 'sonner';
-import { Link2, Copy, Check, Loader2, ArrowRight } from 'lucide-react';
+import { Link2, Copy, Check, Loader2, ArrowRight, Eye } from 'lucide-react';
 
 interface UrlShortenerFormProps {
     onUrlCreated?: (url: ShortUrlDto) => void;
@@ -18,6 +18,8 @@ export function UrlShortenerForm({ onUrlCreated }: UrlShortenerFormProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [shortUrl, setShortUrl] = useState<ShortUrlDto | null>(null);
     const [copied, setCopied] = useState(false);
+    const [isLoadingVisits, setIsLoadingVisits] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const isValidUrl = (url: string) => {
         try {
@@ -73,6 +75,7 @@ export function UrlShortenerForm({ onUrlCreated }: UrlShortenerFormProps) {
                                 onChange={(e) => setLongUrl(e.target.value)}
                                 className="h-12 pl-4 pr-4 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
                                 disabled={isLoading}
+                                ref={inputRef}
                             />
                         </div>
                         <Button
@@ -97,36 +100,74 @@ export function UrlShortenerForm({ onUrlCreated }: UrlShortenerFormProps) {
             </Card>
 
             {shortUrl && (
-                <Card className="p-6 border border-purple-200 shadow-sm bg-purple-50/50 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-purple-900">
-                                Your shortened URL
-                            </span>
-                            <Check className="h-4 w-4 text-purple-600" />
-                        </div>
-
-                        <div className="flex items-center gap-2 p-3 rounded-lg bg-white border border-purple-200">
-                            <code className="flex-1 text-sm font-mono text-gray-900 truncate">
-                                {shortUrl.shortUrl}
-                            </code>
+                <Card className="p-6 border border-gray-200 shadow-sm bg-white">
+                    <div className="space-y-4">
+                        {/* Short URL with Copy Button */}
+                        <div className="flex items-center gap-2">
+                            <div className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg">
+                                <code className="text-sm font-mono text-gray-900">
+                                    {shortUrl.shortUrl}
+                                </code>
+                            </div>
                             <Button
-                                size="sm"
-                                variant="ghost"
                                 onClick={handleCopy}
-                                className="shrink-0 h-8 w-8 p-0 hover:bg-purple-100"
+                                className="px-6 py-2.5 bg-black hover:bg-gray-800 text-white font-medium transition-colors"
                             >
                                 {copied ? (
-                                    <Check className="h-4 w-4 text-purple-600" />
+                                    <>
+                                        <Check className="h-4 w-4 mr-2" />
+                                        Copied
+                                    </>
                                 ) : (
-                                    <Copy className="h-4 w-4 text-gray-600" />
+                                    'Copy URL'
                                 )}
                             </Button>
                         </div>
 
-                        <div className="text-xs text-gray-600">
-                            <span className="font-medium">Original:</span>{' '}
-                            <span className="break-all">{shortUrl.longUrl}</span>
+                        {/* Long URL */}
+                        <div className="text-sm">
+                            <span className="font-medium text-gray-700">Long URL: </span>
+                            <a
+                                href={shortUrl.longUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 hover:underline break-all"
+                            >
+                                {shortUrl.longUrl}
+                            </a>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                            <Button
+                                onClick={() => window.open(`${window.location.origin}/shortener/${shortUrl.code}/visits`, '_blank')}
+                                disabled={isLoadingVisits}
+                                className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-3.5 text-base shadow-sm hover:shadow transition-all"
+                            >
+                                {isLoadingVisits ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                                        Loading...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Eye className="h-5 w-5 mr-2" />
+                                        View Total Clicks
+                                    </>
+                                )}
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setShortUrl(null);
+                                    setLongUrl('');
+                                    setTimeout(() => inputRef.current?.focus(), 100);
+                                }}
+                                variant="outline"
+                                className="flex-1 border-2 border-gray-300 hover:border-purple-600 hover:bg-purple-50 text-gray-700 hover:text-purple-700 font-semibold py-3.5 text-base transition-all"
+                            >
+                                <ArrowRight className="h-5 w-5 mr-2" />
+                                Shorten Another URL
+                            </Button>
                         </div>
                     </div>
                 </Card>
