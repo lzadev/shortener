@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -15,6 +15,7 @@ import { createShortUrl, getVisitCount } from '@/lib/api';
 import { ShortUrlDto } from '@/lib/types';
 import { toast } from 'sonner';
 import { Link2, Copy, Check, Loader2, ArrowRight, Eye, TrendingUp, Calendar, ExternalLink, BarChart3 } from 'lucide-react';
+import * as signalR from '@microsoft/signalr';
 
 interface UrlShortenerFormProps {
     onUrlCreated?: (url: ShortUrlDto) => void;
@@ -29,6 +30,7 @@ export function UrlShortenerForm({ onUrlCreated }: UrlShortenerFormProps) {
     const [showVisitsModal, setShowVisitsModal] = useState(false);
     const [visitCount, setVisitCount] = useState<number | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const connectionRef = useRef<signalR.HubConnection | null>(null);
 
     const isValidUrl = (url: string) => {
         try {
@@ -88,6 +90,40 @@ export function UrlShortenerForm({ onUrlCreated }: UrlShortenerFormProps) {
             setIsLoadingVisits(false);
         }
     };
+
+    // Set up SignalR connection when modal opens
+    useEffect(() => {
+        if (showVisitsModal && !connectionRef.current) {
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7153'}/short-url-history`, {
+                    skipNegotiation: false,
+                    withCredentials: true
+                })
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on('OnShortUrlVisited', (newVisitCount: number) => {
+                console.log('Real-time visit update:', newVisitCount);
+                setVisitCount(newVisitCount);
+                toast.success('🔔 New visit detected!', { duration: 2000 });
+            });
+
+            connection.start()
+                .then(() => {
+                    console.log('SignalR connected');
+                    connectionRef.current = connection;
+                })
+                .catch(err => console.error('SignalR connection error:', err));
+        }
+
+        // Cleanup connection when modal closes
+        return () => {
+            if (!showVisitsModal && connectionRef.current) {
+                connectionRef.current.stop();
+                connectionRef.current = null;
+            }
+        };
+    }, [showVisitsModal]);
 
     return (
         <div className="w-full max-w-3xl mx-auto space-y-4">
