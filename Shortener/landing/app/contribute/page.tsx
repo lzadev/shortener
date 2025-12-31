@@ -148,7 +148,7 @@ export default function ContributePage() {
                         Join our community and help make URL shortening better for everyone
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a href="https://github.com/yourusername/url-shortener" target="_blank" rel="noopener noreferrer">
+                        <a href="https://github.com/lzadev/shortener" target="_blank" rel="noopener noreferrer">
                             <Button size="lg" className="bg-white text-purple-700 hover:bg-gray-100 px-8 py-6 text-lg">
                                 <Github className="mr-2 h-5 w-5" />
                                 Start Contributing
@@ -180,7 +180,7 @@ export default function ContributePage() {
                             <Link href="/" className="hover:text-gray-900 transition-colors">
                                 Home
                             </Link>
-                            <a href="https://github.com/yourusername/url-shortener" target="_blank" className="hover:text-gray-900 transition-colors flex items-center gap-1">
+                            <a href="https://github.com/lzadev/shortener" target="_blank" className="hover:text-gray-900 transition-colors flex items-center gap-1">
                                 <Github className="h-4 w-4" />
                                 GitHub
                             </a>

@@ -32,7 +32,7 @@ export default function Header() {
                             Contribute
                         </Link>
                         <a
-                            href="https://github.com/yourusername/url-shortener"
+                            href="https://github.com/lzadev/shortener"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="hover:text-gray-900 transition-colors"
