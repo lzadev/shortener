@@ -45,7 +45,7 @@ export default function ContributePage() {
     return (
         <div className="min-h-screen bg-white">
             {/* Header */}
-            <header className="border-b border-gray-100">
+            <header className="border-b border-gray-100 sticky top-0 bg-white/80 backdrop-blur-md z-50">
                 <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center">
@@ -53,6 +53,10 @@ export default function ContributePage() {
                         </div>
                         <span className="text-lg font-semibold text-gray-900">URL Shortener</span>
                     </Link>
+                    <nav className="hidden md:flex items-center gap-6 text-sm text-gray-600">
+                        <Link href="/" className="hover:text-gray-900 transition-colors">Home</Link>
+                        <Link href="/contribute" className="text-purple-600 font-medium border-b-2 border-purple-600 pb-1">Contribute</Link>
+                    </nav>
                     <Link href="/app">
                         <Button className="bg-black hover:bg-gray-800 text-white">
                             Start Shortening
