@@ -71,8 +71,8 @@ export default function LandingPage() {
             <section className="container mx-auto px-4 py-20 md:py-32">
                 <div className="text-center max-w-4xl mx-auto space-y-8">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-purple-200 bg-purple-50">
-                        <Sparkles className="h-3.5 w-3.5 text-purple-600" />
-                        <span className="text-xs font-medium text-purple-700">Open Source URL Shortener</span>
+                        <Zap className="h-3.5 w-3.5 text-purple-600" />
+                        <span className="text-xs font-medium text-purple-700">Fast & Reliable URL Shortening</span>
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 leading-tight">
@@ -83,13 +83,14 @@ export default function LandingPage() {
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                        Transform your long URLs into short, shareable links in seconds. Track clicks,
-                        manage links, and get real-time analytics—all powered by modern technology.
+                        Transform your long URLs into short, shareable links in seconds. Track clicks
+                        and manage all your links in one place.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                         <Link href="/app">
                             <Button size="lg" className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-6 text-lg">
+                                <Link2 className="mr-2 h-5 w-5" />
                                 Get Started Free
                             </Button>
                         </Link>
@@ -171,27 +172,45 @@ export default function LandingPage() {
             </section>
 
             {/* Footer */}
-            <footer className="border-t border-gray-100 py-12">
+            <footer className="border-t border-gray-200 bg-white py-12">
                 <div className="container mx-auto px-4">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center">
-                                <Link2 className="h-4 w-4 text-white" />
-                            </div>
-                            <span className="text-sm text-gray-600">
-                                Open Source URL Shortener
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-6 text-sm text-gray-600">
-                            <Link href="/contribute" className="hover:text-gray-900 transition-colors flex items-center gap-1">
-                                <Heart className="h-4 w-4" />
-                                Contribute
-                            </Link>
-                            <a href="https://github.com/yourusername/url-shortener" target="_blank" className="hover:text-gray-900 transition-colors flex items-center gap-1">
-                                <Github className="h-4 w-4" />
-                                GitHub
+                    {/* Copyright and Powered By */}
+                    <div className="text-center mb-8">
+                        <p className="text-sm text-gray-600 mb-2">
+                            © {new Date().getFullYear()} URL Shortener - Tool to shorten a long link
+                        </p>
+                        <p className="text-sm text-gray-500">
+                            Powered by{' '}
+                            <a
+                                href="https://github.com/lzadev"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-purple-600 hover:text-purple-700 transition-colors font-medium"
+                            >
+                                LZADev
                             </a>
-                        </div>
+                        </p>
+                    </div>
+
+                    {/* Links */}
+                    <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600">
+                        <Link href="/app" className="hover:text-gray-900 transition-colors">
+                            ShortURL
+                        </Link>
+                        <Link href="/app" className="hover:text-gray-900 transition-colors">
+                            URL Click Counter
+                        </Link>
+                        <Link href="/contribute" className="hover:text-gray-900 transition-colors">
+                            Contribute
+                        </Link>
+                        <a
+                            href="https://github.com/yourusername/url-shortener"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-gray-900 transition-colors"
+                        >
+                            GitHub
+                        </a>
                     </div>
                 </div>
             </footer>
