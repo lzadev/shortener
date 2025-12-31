@@ -17,10 +17,15 @@ var redis = builder.AddRedis("redis")
         interval: TimeSpan.FromMinutes(5),
         keysChangedThreshold: 100);
 
-builder.AddProject<Projects.Shortener_Api>("shortener-api")
+var api = builder.AddProject<Projects.Shortener_Api>("shortener-api")
     .WithReference(shortenerDb)
     .WithReference(migrations)
     .WithReference(redis)
     .WaitFor(migrations);
+
+
+builder.AddJavaScriptApp("shortener-frontend", "frontend")
+    .WithReference(api)
+    .WaitFor(api);
 
 builder.Build().Run();
